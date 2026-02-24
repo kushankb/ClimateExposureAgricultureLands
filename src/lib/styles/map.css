@@ -44,36 +44,10 @@ html, body {
 .mapboxgl-ctrl-attrib a { color: var(--text-muted) !important; }
 .mapboxgl-ctrl-logo { opacity: 0.4 !important; }
 
-/* ── Header ─────────────────────────────────────────────────── */
-.app-header {
-  position: absolute;
-  top: 20px; left: 20px;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.app-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
-}
-
-.app-subtitle {
-  font-size: 0.72rem;
-  font-weight: 400;
-  color: var(--text-secondary);
-  margin-top: 3px;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
-}
-
 /* ── Control Panel ──────────────────────────────────────────── */
 .control-panel {
   position: absolute;
-  top: 20px; right: 20px;
+  top: 20px; left: 20px;
   z-index: 10;
   width: 250px;
   max-height: calc(100vh - 60px);
@@ -288,10 +262,10 @@ html, body {
   margin: 12px 0;
 }
 
-/* ── Legend stack (bottom-left, multiple legends stacked) ───── */
+/* ── Legend stack (bottom-right, multiple legends stacked) ───── */
 .legend-stack {
   position: absolute;
-  bottom: 36px; left: 20px;
+  bottom: 36px; right: 20px;
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -405,19 +379,44 @@ html, body {
 .popup-value { color: var(--text-primary); font-weight: 500; font-variant-numeric: tabular-nums; }
 .popup-range { font-size: 0.67rem; color: var(--text-muted); margin-top: 4px; }
 
-/* ── Scenario badge ─────────────────────────────────────────── */
-.scenario-badge {
-  position: absolute;
-  bottom: 36px; right: 20px;
-  z-index: 10;
-  background: var(--bg-panel);
+/* ── Panel header (title + info button) ─────────────────────── */
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.panel-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.info-btn {
+  flex-shrink: 0;
+  width: 18px; height: 18px;
+  padding: 0;
+  background: transparent;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 5px 10px;
-  font-size: 0.67rem;
+  border-radius: 50%;
   color: var(--text-muted);
-  letter-spacing: 0.06em;
-  backdrop-filter: blur(12px);
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+  margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.info-btn:hover {
+  color: var(--text-secondary);
+  border-color: var(--text-muted);
 }
 
 /* ── Loading overlay ────────────────────────────────────────── */

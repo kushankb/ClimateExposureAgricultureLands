@@ -16,18 +16,31 @@
     { key: 'p95', label: '95th' },
   ];
 
-  // Tooltip state
+  // Tooltip state (layer buttons + info button)
   let tooltipKey = $state(null);
-  let tooltipPos = $state({ top: 0, left: 0 });
+  let tooltipPos = $state({ top: 0, right: 0 });
+  let infoTooltipVisible = $state(false);
+  let infoTooltipPos = $state({ top: 0, left: 0 });
 
   function showTooltip(event, key) {
     const rect = event.currentTarget.getBoundingClientRect();
-    tooltipPos = { top: rect.top + rect.height / 2, left: rect.left - 12 };
+    // Panel is on the left — tooltips appear to the right of buttons
+    tooltipPos = { top: rect.top + rect.height / 2, left: rect.right + 12 };
     tooltipKey = key;
   }
 
   function hideTooltip() {
     tooltipKey = null;
+  }
+
+  function showInfoTooltip(event) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    infoTooltipPos = { top: rect.bottom + 6, left: rect.left };
+    infoTooltipVisible = true;
+  }
+
+  function hideInfoTooltip() {
+    infoTooltipVisible = false;
   }
 
   let breadbasketActive = $derived(activeLayers.includes('breadbaskets'));
@@ -36,6 +49,18 @@
 </script>
 
 <div class="control-panel">
+  <!-- Panel header -->
+  <div class="panel-header">
+    <div class="panel-title">Global Agriculture<br />Exposure to Weather Extremes</div>
+    <button
+      class="info-btn"
+      onmouseenter={showInfoTooltip}
+      onmouseleave={hideInfoTooltip}
+      aria-label="About this data"
+    >ⓘ</button>
+  </div>
+  <hr class="panel-divider" />
+
   <!-- Base Layer -->
   <div class="panel-section-label">Base Layer</div>
 
@@ -159,16 +184,27 @@
   {/if}
 </div>
 
-<!-- Fixed-position tooltip (replaces React createPortal) -->
+<!-- Layer description tooltip (right of panel) -->
 {#if tooltipKey && LAYER_DESCRIPTIONS[tooltipKey]}
   {@const info = LAYER_DESCRIPTIONS[tooltipKey]}
   <div
     class="layer-tooltip"
-    style="top: {tooltipPos.top}px; left: {tooltipPos.left}px; transform: translate(-100%, -50%)"
+    style="top: {tooltipPos.top}px; left: {tooltipPos.left}px; transform: translate(0, -50%)"
   >
     {info.text}
     {#if info.source}
       <span class="tooltip-source">{info.source}</span>
     {/if}
+  </div>
+{/if}
+
+<!-- Info button tooltip -->
+{#if infoTooltipVisible}
+  <div
+    class="layer-tooltip"
+    style="top: {infoTooltipPos.top}px; left: {infoTooltipPos.left}px; transform: translate(0, 0)"
+  >
+    CMIP6 · SSP2-4.5 · 2°C GMT warming compared to now
+    <span class="tooltip-source">Bajaj et al. 2025, Environ. Res. Lett.</span>
   </div>
 {/if}
