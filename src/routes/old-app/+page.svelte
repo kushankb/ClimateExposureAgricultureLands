@@ -45,14 +45,6 @@
   <div class="loading-text">Loading global agriculture data…</div>
 </div>
 
-<!-- Header -->
-<div class="app-header">
-  <div class="app-title">
-    Global Agriculture<br />Exposure to Weather Extremes
-  </div>
-  <div class="app-subtitle">CMIP6 · SSP2-4.5 · 2°C GMT compared to now</div>
-</div>
-
 <!-- Map -->
 <Map
   {activeLayers}
@@ -74,5 +66,3 @@
 <!-- Legends -->
 <Legend config={legendConfig} {breadbasketActive} />
 
-<!-- Scenario badge -->
-<div class="scenario-badge">SSP2-4.5 · CMIP6 Ensemble · 2°C GMT</div>
