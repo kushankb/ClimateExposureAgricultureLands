@@ -162,8 +162,9 @@
       zoom: 2,
       minZoom: 1,
       maxZoom: 8,
-      projection: 'globe',
+      projection: 'mercator',
       antialias: true,
+      hash: true,
     });
 
     mapRef = m;
@@ -210,8 +211,8 @@
     });
 
     m.addControl(
-      new mapboxgl.NavigationControl({ showCompass: false }),
-      'bottom-right'
+      new mapboxgl.NavigationControl({ showCompass: true }),
+      'top-right'
     );
 
     return () => {
