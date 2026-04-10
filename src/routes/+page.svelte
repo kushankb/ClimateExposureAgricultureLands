@@ -1,5 +1,6 @@
 <script>
   import "../app.css";
+  import { base } from '$app/paths';
   import NavCard from "$lib/components/NavCard.svelte";
 </script>
 
@@ -9,7 +10,7 @@
 
   <div class="card-grid">
     <NavCard
-      href="/old-app"
+      href="{base}/old-app"
       title="Agriculture Exposure Original App"
       description="Interactive map showing breadbasket regions overlaid with CMIP6 climate projections (CDD, FD, Rx5, Tx35) under SSP2-4.5 at 2°C warming."
     />

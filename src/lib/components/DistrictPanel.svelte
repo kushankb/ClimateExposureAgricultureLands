@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { base } from '$app/paths';
   import { FOOD_GROUP_COLORS } from '$lib/layers/tilesetIds.js';
 
   let { stateId = null, countryId = null, selectedPercentile = 'p50', onClose = () => {} } = $props();
@@ -34,7 +35,7 @@
     if (allData || loading) return;
     loading = true;
     try {
-      const r = await fetch('/district_stats.json');
+      const r = await fetch(`${base}/district_stats.json`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       allData = await r.json();
     } catch (e) {

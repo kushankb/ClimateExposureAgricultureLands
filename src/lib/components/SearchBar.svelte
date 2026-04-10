@@ -1,4 +1,5 @@
 <script>
+  import { base } from '$app/paths';
   let { onSelect = () => {} } = $props();
 
   let query = $state('');
@@ -12,7 +13,7 @@
     if (allData || loading) return;
     loading = true;
     try {
-      const r = await fetch('/district_stats.json');
+      const r = await fetch(`${base}/district_stats.json`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       allData = await r.json();
     } catch (e) {

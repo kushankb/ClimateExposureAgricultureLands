@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { base } from '$app/paths';
   import { FOOD_GROUP_COLORS } from '$lib/layers/tilesetIds.js';
 
   let { activeLayers, selectedPercentile } = $props();
@@ -43,7 +44,7 @@
 
   onMount(async () => {
     try {
-      const r = await fetch('/exposure_curves.json');
+      const r = await fetch(`${base}/exposure_curves.json`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       curves = await r.json();
       // Start every slider at index 0 (= "no change") so the bars are full,
