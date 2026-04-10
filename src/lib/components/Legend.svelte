@@ -1,7 +1,7 @@
 <script>
   import { FOOD_GROUP_COLORS } from '$lib/layers/tilesetIds.js';
 
-  let { config, breadbasketActive } = $props();
+  let { config, breadbasketActive, selectedFoodGroup = null, onSelectFoodGroup = () => {} } = $props();
 
   let gradientStyle = $derived.by(() => {
     if (!config?.legendColors) return '';
@@ -13,6 +13,10 @@
   });
 
   const foodGroups = Object.entries(FOOD_GROUP_COLORS);
+
+  function handleSwatchClick(key) {
+    onSelectFoodGroup(selectedFoodGroup === key ? null : key);
+  }
 </script>
 
 <div class="legend-stack">
@@ -37,11 +41,21 @@
       <div class="legend-title">Food Breadbaskets</div>
       <div class="legend-swatches">
         {#each foodGroups as [key, { color, label }]}
-          <div class="legend-swatch-row">
+          <div
+            class="legend-swatch-row clickable {selectedFoodGroup && selectedFoodGroup !== key ? 'dimmed' : ''} {selectedFoodGroup === key ? 'selected' : ''}"
+            onclick={() => handleSwatchClick(key)}
+            title={selectedFoodGroup === key ? `Click to show all food groups` : `Click to show only ${label}`}
+            role="button"
+            tabindex="0"
+            onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSwatchClick(key); }}
+          >
             <span class="legend-swatch" style="background: {color}"></span>
             <span class="legend-swatch-label">{label}</span>
           </div>
         {/each}
+      </div>
+      <div class="legend-hint {selectedFoodGroup ? 'faded' : 'pulse'}">
+        {selectedFoodGroup ? 'Click selected group to reset' : 'Click a food group to filter'}
       </div>
     </div>
   {/if}

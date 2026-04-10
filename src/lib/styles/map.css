@@ -29,6 +29,7 @@ html, body {
   width: 100%; height: 100%;
   overflow: hidden;
   font-family: 'Inter', system-ui, sans-serif;
+  font-size: 110%;  /* 10% larger base — scales all rem-based sizes */
   background: var(--bg-base);
   color: var(--text-primary);
 }
@@ -49,7 +50,7 @@ html, body {
   position: absolute;
   top: 20px; left: 20px;
   z-index: 10;
-  width: 250px;
+  width: 270px;
   max-height: calc(100vh - 60px);
   overflow-y: auto;
   background: var(--bg-panel);
@@ -131,7 +132,7 @@ html, body {
 
 .layer-tooltip {
   position: fixed;
-  width: 230px;
+  width: 280px;
   padding: 10px 12px;
   background: rgba(10, 14, 20, 0.97);
   border: 1px solid var(--border);
@@ -379,6 +380,13 @@ html, body {
 .popup-value { color: var(--text-primary); font-weight: 500; font-variant-numeric: tabular-nums; }
 .popup-range { font-size: 0.67rem; color: var(--text-muted); margin-top: 4px; }
 
+.popup-desc {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
 /* ── Panel header (title + info button) ─────────────────────── */
 .panel-header {
   display: flex;
@@ -448,4 +456,223 @@ html, body {
 .loading-text {
   font-size: 0.8rem;
   color: var(--text-secondary);
+}
+
+/* ── Breadbasket method selector ──────────────────────────── */
+.method-selector {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.method-btn {
+  flex: 1;
+  padding: 5px 0;
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: center;
+}
+
+.method-btn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-panel-hover);
+}
+
+.method-btn.active {
+  color: var(--text-primary);
+  border-color: #e6a532;
+  background: color-mix(in srgb, #e6a532 12%, transparent);
+}
+
+.method-hint {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* ── Info Panel (About this map) ──────────────────────────── */
+.info-panel {
+  position: absolute;
+  top: 20px; right: 60px;
+  z-index: 10;
+  max-width: 340px;
+}
+
+.info-toggle {
+  padding: 6px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: all var(--transition);
+}
+
+.info-toggle:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.info-content {
+  margin-top: 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+}
+
+.info-content::-webkit-scrollbar { width: 4px; }
+.info-content::-webkit-scrollbar-track { background: transparent; }
+.info-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.info-section-title {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.findings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.finding-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.finding-icon { font-size: 1rem; }
+.finding-stat { font-size: 0.72rem; font-weight: 600; color: var(--text-primary); }
+.finding-text { font-size: 0.62rem; color: var(--text-secondary); line-height: 1.4; }
+
+.burdens-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.burden-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.02);
+  border-radius: var(--radius-sm);
+}
+
+.bi-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+.bi-text { flex: 1; }
+.bi-name { font-size: 0.7rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.bi-detail { font-size: 0.62rem; color: var(--text-secondary); line-height: 1.4; }
+.bi-threshold { font-size: 0.58rem; color: var(--text-muted); margin-top: 2px; font-style: italic; }
+
+.info-sources {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-source-row {
+  display: flex;
+  gap: 8px;
+  font-size: 0.62rem;
+  line-height: 1.4;
+}
+
+.info-source-label {
+  color: var(--text-muted);
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.info-source-value { color: var(--text-secondary); }
+
+.info-cite {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.info-cite-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+.info-cite-link:hover { text-decoration: underline; }
+
+.info-built-by {
+  margin-top: 8px;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+/* ── Interactive legend swatches ──────────────────────────── */
+.legend-swatch-row.clickable {
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: opacity var(--transition), background var(--transition);
+}
+
+.legend-swatch-row.clickable:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.legend-swatch-row.dimmed {
+  opacity: 0.3;
+}
+
+.legend-swatch-row.selected {
+  background: rgba(255,255,255,0.08);
+}
+
+.legend-hint {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 6px;
+  transition: opacity var(--transition);
+}
+
+.legend-hint.pulse {
+  animation: hintPulse 2s ease-in-out infinite;
+}
+
+.legend-hint.faded {
+  opacity: 0.5;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }

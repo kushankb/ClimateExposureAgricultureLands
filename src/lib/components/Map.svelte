@@ -4,15 +4,22 @@
   import 'mapbox-gl/dist/mapbox-gl.css';
   import {
     BREADBASKET,
+    BREADBASKET_METHODS,
     RASTER_OVERLAYS,
     FOOD_GROUP_COLORS,
+    FOOD_GROUP_CODES,
+    FOOD_GROUP_BY_CODE,
+    ADMIN2_STATES,
+    COUNTRY_BOUNDARIES,
+    methodCodeExpr,
+    decodePackedC,
     getTileDir,
   } from '$lib/layers/tilesetIds.js';
 
-  let { activeLayers, layerOpacity, selectedPercentile, onLegendChange } = $props();
+  let { activeLayers, layerOpacity, selectedPercentile, selectedMethod, selectedFoodGroup, onLegendChange, selectedStateId = null, selectedCountryId = null, onStateSelect = () => {}, onCountrySelect = () => {} } = $props();
 
-  // TODO: move to $env/static/public when ready
-  const MAPBOX_TOKEN = 'pk.eyJ1IjoiaGlnaGVzdHJvYWQiLCJhIjoiY21senhycGFvMDI5NDNlcHpxbm5qdzJmcyJ9.9EuVHmWXRQOKNpVAG5A4mQ';
+  import { PUBLIC_MAPBOX_TOKEN } from '$env/static/public';
+  const MAPBOX_TOKEN = PUBLIC_MAPBOX_TOKEN;
 
   const PERCENTILES = ['p05', 'p50', 'p95'];
   const CLIMATE_KEYS = ['CDD', 'FD', 'Rx5', 'Tx35'];
@@ -28,10 +35,13 @@
     1, 0.5, 2, 0.7, 3, 1.0, 4, 1.4, 5, 2.0, 6, 2.8, 7, 3.6, 8, 4.5,
   ];
 
-  function buildFoodGroupColorExpr() {
-    const expr = ['match', ['get', BREADBASKET.groupKey]];
+  function buildFoodGroupColorExpr(methodKey) {
+    // The packed tile stores all 3 method codes in a single integer `c`.
+    // We extract the relevant code via methodCodeExpr() and match to a colour.
+    const expr = ['match', methodCodeExpr(methodKey || 'zscore')];
     Object.entries(FOOD_GROUP_COLORS).forEach(([key, { color }]) => {
-      expr.push(key, color);
+      const code = FOOD_GROUP_CODES[key];
+      if (code !== undefined) expr.push(code, color);
     });
     expr.push('#444444');
     return expr;
@@ -41,6 +51,20 @@
     m.addSource('breadbaskets', {
       type: 'vector',
       url: `mapbox://${BREADBASKET.id}`,
+    });
+
+    // Country boundaries (visible z0–z5)
+    m.addSource('countries', {
+      type: 'vector',
+      url: `mapbox://${COUNTRY_BOUNDARIES.id}`,
+      promoteId: { [COUNTRY_BOUNDARIES.layer]: COUNTRY_BOUNDARIES.idKey },
+    });
+
+    // Admin2 state/province boundaries (visible z4+)
+    m.addSource('admin2', {
+      type: 'vector',
+      url: `mapbox://${ADMIN2_STATES.id}`,
+      promoteId: { [ADMIN2_STATES.layer]: ADMIN2_STATES.idKey },
     });
 
     for (const key of CLIMATE_KEYS) {
@@ -67,6 +91,70 @@
   }
 
   function addAllLayers(m) {
+    // Country fill (z0–z5, for click/hover detection)
+    m.addLayer({
+      id: 'country-fill',
+      type: 'fill',
+      source: 'countries',
+      'source-layer': COUNTRY_BOUNDARIES.layer,
+      maxzoom: 4,
+      paint: {
+        'fill-color': '#ffffff',
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          0.12,
+          0.0,
+        ],
+      },
+    });
+
+    // Country outline (z0–z3)
+    m.addLayer({
+      id: 'country-outline',
+      type: 'line',
+      source: 'countries',
+      'source-layer': COUNTRY_BOUNDARIES.layer,
+      maxzoom: 4,
+      paint: {
+        'line-color': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#00d4ff',
+          ['boolean', ['feature-state', 'hover'], false],
+          'rgba(255, 255, 255, 0.55)',
+          'rgba(255, 255, 255, 0.3)',
+        ],
+        'line-width': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          2.5,
+          ['boolean', ['feature-state', 'hover'], false],
+          1.2,
+          0.6,
+        ],
+      },
+    });
+
+    // Admin2 fill (z6+, for click/hover detection)
+    m.addLayer({
+      id: 'admin2-fill',
+      type: 'fill',
+      source: 'admin2',
+      'source-layer': ADMIN2_STATES.layer,
+      minzoom: 4,
+      paint: {
+        'fill-color': '#ffffff',
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          0.12,
+          0.0,
+        ],
+      },
+    });
+
+    // Breadbaskets (dots)
     m.addLayer({
       id: 'breadbaskets-layer',
       type: 'circle',
@@ -84,6 +172,45 @@
         'circle-stroke-color':   '#ffffff',
         'circle-stroke-opacity': 0.5,
         'circle-blur':           0.0,
+      },
+    });
+
+    // Admin2 outline (z4+, ON TOP of breadbaskets so borders are visible)
+    m.addLayer({
+      id: 'admin2-outline',
+      type: 'line',
+      source: 'admin2',
+      'source-layer': ADMIN2_STATES.layer,
+      minzoom: 4,
+      paint: {
+        'line-color': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#00d4ff',
+          ['boolean', ['feature-state', 'hover'], false],
+          'rgba(255, 255, 255, 0.55)',
+          'rgba(255, 255, 255, 0.3)',
+        ],
+        'line-width': [
+          'interpolate', ['linear'], ['zoom'],
+          2, 0,
+          4, [
+            'case',
+            ['boolean', ['feature-state', 'selected'], false],
+            2.0,
+            ['boolean', ['feature-state', 'hover'], false],
+            1.0,
+            0.4,
+          ],
+          6, [
+            'case',
+            ['boolean', ['feature-state', 'selected'], false],
+            2.5,
+            ['boolean', ['feature-state', 'hover'], false],
+            1.2,
+            0.6,
+          ],
+        ],
       },
     });
 
@@ -114,16 +241,106 @@
     });
   }
 
+  // Track hovered/selected features for feature-state
+  let hoveredAdmin2Id = null;
+  let selectedAdmin2FeatureId = null;
+  let hoveredCountryId = null;
+  let selectedCountryFeatureId = null;
+
+  function setupCountryEvents(m) {
+    m.on('mousemove', 'country-fill', (e) => {
+      if (!e.features?.length) return;
+      const feat = e.features[0];
+      if (hoveredCountryId !== null && hoveredCountryId !== feat.id) {
+        m.setFeatureState({ source: 'countries', sourceLayer: COUNTRY_BOUNDARIES.layer, id: hoveredCountryId }, { hover: false });
+      }
+      hoveredCountryId = feat.id;
+      m.setFeatureState({ source: 'countries', sourceLayer: COUNTRY_BOUNDARIES.layer, id: hoveredCountryId }, { hover: true });
+      m.getCanvas().style.cursor = 'pointer';
+    });
+
+    m.on('mouseleave', 'country-fill', () => {
+      if (hoveredCountryId !== null) {
+        m.setFeatureState({ source: 'countries', sourceLayer: COUNTRY_BOUNDARIES.layer, id: hoveredCountryId }, { hover: false });
+        hoveredCountryId = null;
+      }
+      m.getCanvas().style.cursor = '';
+    });
+
+    m.on('click', 'country-fill', (e) => {
+      if (!e.features?.length) return;
+      const feat = e.features[0];
+      const iso3 = feat.properties[COUNTRY_BOUNDARIES.idKey];
+
+      // Deselect previous
+      if (selectedCountryFeatureId !== null) {
+        m.setFeatureState({ source: 'countries', sourceLayer: COUNTRY_BOUNDARIES.layer, id: selectedCountryFeatureId }, { selected: false });
+      }
+
+      // Toggle
+      if (iso3 === selectedCountryId) {
+        selectedCountryFeatureId = null;
+        onCountrySelect(null);
+      } else {
+        selectedCountryFeatureId = feat.id;
+        m.setFeatureState({ source: 'countries', sourceLayer: COUNTRY_BOUNDARIES.layer, id: feat.id }, { selected: true });
+        onCountrySelect(iso3);
+      }
+    });
+  }
+
+  function setupAdmin2Events(m) {
+    m.on('mousemove', 'admin2-fill', (e) => {
+      if (!e.features?.length) return;
+      const feat = e.features[0];
+      if (hoveredAdmin2Id !== null && hoveredAdmin2Id !== feat.id) {
+        m.setFeatureState({ source: 'admin2', sourceLayer: ADMIN2_STATES.layer, id: hoveredAdmin2Id }, { hover: false });
+      }
+      hoveredAdmin2Id = feat.id;
+      m.setFeatureState({ source: 'admin2', sourceLayer: ADMIN2_STATES.layer, id: hoveredAdmin2Id }, { hover: true });
+      m.getCanvas().style.cursor = 'pointer';
+    });
+
+    m.on('mouseleave', 'admin2-fill', () => {
+      if (hoveredAdmin2Id !== null) {
+        m.setFeatureState({ source: 'admin2', sourceLayer: ADMIN2_STATES.layer, id: hoveredAdmin2Id }, { hover: false });
+        hoveredAdmin2Id = null;
+      }
+      m.getCanvas().style.cursor = '';
+    });
+
+    m.on('click', 'admin2-fill', (e) => {
+      if (!e.features?.length) return;
+      const feat = e.features[0];
+      const stateId = feat.properties[ADMIN2_STATES.idKey];
+
+      // Deselect previous
+      if (selectedAdmin2FeatureId !== null) {
+        m.setFeatureState({ source: 'admin2', sourceLayer: ADMIN2_STATES.layer, id: selectedAdmin2FeatureId }, { selected: false });
+      }
+
+      // Toggle
+      if (stateId === selectedStateId) {
+        selectedAdmin2FeatureId = null;
+        onStateSelect(null);
+      } else {
+        selectedAdmin2FeatureId = feat.id;
+        m.setFeatureState({ source: 'admin2', sourceLayer: ADMIN2_STATES.layer, id: feat.id }, { selected: true });
+        onStateSelect(stateId);
+      }
+    });
+  }
+
   function setupHoverEvents(m, popup, getActiveLayers) {
     m.on('mouseenter', 'breadbaskets-layer', (e) => {
       if (!getActiveLayers().includes('breadbaskets')) return;
       m.getCanvas().style.cursor = 'crosshair';
       if (!e.features?.length) return;
       const props = e.features[0].properties;
-      const fg = FOOD_GROUP_COLORS[props[BREADBASKET.groupKey]] || {
-        label: props[BREADBASKET.groupKey],
-        color: '#888',
-      };
+      const methodKey = (BREADBASKET_METHODS[selectedMethod] || BREADBASKET_METHODS.zscore).key;
+      const code = decodePackedC(props.c, methodKey);
+      const key = FOOD_GROUP_BY_CODE[code];
+      const fg = FOOD_GROUP_COLORS[key] || { label: String(code), color: '#888', desc: '' };
       popup
         .setLngLat(e.lngLat)
         .setHTML(
@@ -131,10 +348,7 @@
             <span class="popup-swatch" style="background:${fg.color}"></span>
             ${fg.label}
           </div>
-          <div class="popup-row">
-            <span class="popup-key">Production</span>
-            <span class="popup-value">${Number(props[BREADBASKET.valueKey] || 0).toLocaleString()}</span>
-          </div>`
+          ${fg.desc ? `<div class="popup-desc">${fg.desc}</div>` : ''}`
         )
         .addTo(m);
     });
@@ -143,6 +357,13 @@
       m.getCanvas().style.cursor = '';
       popup.remove();
     });
+  }
+
+  // Expose flyTo for search bar
+  export function flyTo(lng, lat, zoom = 5) {
+    if (mapRef) {
+      mapRef.flyTo({ center: [lng, lat], zoom, duration: 1500 });
+    }
   }
 
   let mapContainer;
@@ -207,6 +428,8 @@
       addAllSources(m);
       addAllLayers(m);
       setupHoverEvents(m, popup, () => activeLayersSnapshot);
+      setupCountryEvents(m);
+      setupAdmin2Events(m);
       mapReady = true;  // triggers $effect to run with the now-ready map
     });
 
@@ -236,6 +459,19 @@
       if (bbActive) {
         m.setPaintProperty('breadbaskets-layer', 'circle-opacity', layerOpacity.breadbaskets);
         m.setPaintProperty('breadbaskets-layer', 'circle-stroke-opacity', layerOpacity.breadbaskets * 0.5);
+
+        // Update color expression based on selected classification method
+        const methodKey = (BREADBASKET_METHODS[selectedMethod] || BREADBASKET_METHODS.zscore).key;
+        m.setPaintProperty('breadbaskets-layer', 'circle-color', buildFoodGroupColorExpr(methodKey));
+      }
+
+      // Food-group filter (extract the active method's code from packed `c`)
+      const methodKey = (BREADBASKET_METHODS[selectedMethod] || BREADBASKET_METHODS.zscore).key;
+      if (selectedFoodGroup) {
+        const code = FOOD_GROUP_CODES[selectedFoodGroup];
+        m.setFilter('breadbaskets-layer', ['==', methodCodeExpr(methodKey), code]);
+      } else {
+        m.setFilter('breadbaskets-layer', null);
       }
     }
 
@@ -261,6 +497,18 @@
       if (fsActive) {
         m.setPaintProperty(fsLid, 'raster-opacity', layerOpacity.farmsize ?? 0.65);
       }
+    }
+
+    // Sync country selection highlight
+    if (selectedCountryId == null && selectedCountryFeatureId !== null) {
+      m.setFeatureState({ source: 'countries', sourceLayer: COUNTRY_BOUNDARIES.layer, id: selectedCountryFeatureId }, { selected: false });
+      selectedCountryFeatureId = null;
+    }
+
+    // Sync admin2 selection highlight
+    if (selectedStateId == null && selectedAdmin2FeatureId !== null) {
+      m.setFeatureState({ source: 'admin2', sourceLayer: ADMIN2_STATES.layer, id: selectedAdmin2FeatureId }, { selected: false });
+      selectedAdmin2FeatureId = null;
     }
 
     // Update legend (last active overlay wins)

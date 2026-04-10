@@ -8,33 +8,112 @@
 
 // -- Food group colour palette (bright for dark backgrounds) -----------------
 export const FOOD_GROUP_COLORS = {
-  grains:           { color: "#f5c542", label: "Grains" },
-  meat_and_fish:    { color: "#ff6b6b", label: "Meat & Fish" },
-  dairy_and_eggs:   { color: "#fff06a", label: "Dairy & Eggs" },
-  fruits:           { color: "#7dde60", label: "Fruits" },
-  vegetables:       { color: "#3dcc3d", label: "Vegetables" },
-  oils_and_oilseed: { color: "#e89840", label: "Oils & Oilseeds" },
-  pulses:           { color: "#c4855c", label: "Pulses" },
-  starchy_roots:    { color: "#d49ce8", label: "Starchy Roots" },
-  treenuts:         { color: "#5ea54a", label: "Tree Nuts" },
-  other:            { color: "#aaaaaa", label: "Other" },
+  starches:             { color: "#f5c542", label: "Starches",            desc: "Wheat, rice, maize, potatoes, cassava & other starchy staples" },
+  meat_and_fish:        { color: "#ff6b6b", label: "Meat & Fish",         desc: "Beef, pork, poultry, seafood & other animal proteins" },
+  dairy_and_eggs:       { color: "#fff06a", label: "Dairy & Eggs",        desc: "Milk, cheese, butter, yoghurt & eggs" },
+  fruits:               { color: "#7dde60", label: "Fruits",              desc: "Tropical, temperate & citrus fruits (bananas, apples, oranges, etc.)" },
+  vegetables:           { color: "#3dcc3d", label: "Vegetables",          desc: "Leafy greens, tomatoes, onions, peppers & other vegetables" },
+  oils_and_oilseed:     { color: "#e89840", label: "Oils & Oilseeds",    desc: "Soybean, palm, rapeseed, sunflower & other oil crops" },
+  pulses:               { color: "#c4855c", label: "Pulses",             desc: "Lentils, chickpeas, beans, peas & other legumes" },
+  sugar_and_sweeteners: { color: "#d49ce8", label: "Sugar & Sweeteners", desc: "Sugarcane, sugar beet & other sweetener crops" },
+  treenuts:             { color: "#5ea54a", label: "Tree Nuts",           desc: "Almonds, cashews, walnuts, pistachios & other tree nuts" },
+  other:                { color: "#aaaaaa", label: "Other",               desc: "Spices, cocoa, coffee, tea & other crops" },
 };
 
+// Integer codes used in the compact vector tiles (must match process_breadbaskets.py)
+// Order matches FOOD_GROUP_MAP in the python script.
+export const FOOD_GROUP_CODES = {
+  dairy_and_eggs:       0,
+  fruits:               1,
+  meat_and_fish:        2,
+  oils_and_oilseed:     3,
+  other:                4,
+  pulses:               5,
+  starches:             6,
+  sugar_and_sweeteners: 7,
+  treenuts:             8,
+  vegetables:           9,
+};
+export const FOOD_GROUP_BY_CODE = Object.fromEntries(
+  Object.entries(FOOD_GROUP_CODES).map(([k, v]) => [v, k])
+);
+
 // -- Breadbasket (vector tile -- toggleable base layer) -----------------------
+// The packed tile has a single integer property `c` where:
+//   c = z*100 + s*10 + r   (z=zscore code, s=share code, r=rank code, 0-9 each)
 export const BREADBASKET = {
-  id: "plotline.cndbsry2",
-  layer: "prod_overview",
+  id: "kushankb.breadbaskets4",
+  layer: "breadbaskets",
   label: "Food Breadbaskets",
-  groupKey: "max_food_group",
-  valueKey: "max_food_group_value",
+  groupKey: "zscore",     // default method key — overridden by selected method
+  valueKey: "c",
+};
+
+// Mapbox GL JS expression that extracts the integer code for a given method
+// from the packed `c` property.
+export function methodCodeExpr(methodKey) {
+  if (methodKey === "zscore") {
+    return ["floor", ["/", ["get", "c"], 100]];
+  }
+  if (methodKey === "share") {
+    return ["floor", ["/", ["%", ["get", "c"], 100], 10]];
+  }
+  // rank
+  return ["%", ["get", "c"], 10];
+}
+
+// JS-side decoder for popups etc.
+export function decodePackedC(c, methodKey) {
+  if (c == null) return null;
+  if (methodKey === "zscore") return Math.floor(c / 100);
+  if (methodKey === "share")  return Math.floor((c % 100) / 10);
+  return c % 10; // rank
+}
+
+// -- Breadbasket classification methods ----------------------------------------
+// Each method defines how the "dominant food group" is determined per pixel.
+// `groupKey` is the vector-tile property that holds the dominant food group name.
+export const BREADBASKET_METHODS = {
+  zscore: {
+    key: "zscore",
+    label: "Z-Score",
+    groupKey: "zscore",
+    short: "Most unusually high food group",
+    description:
+      "Which food group is most unusually high at this pixel, relative to its own global distribution?",
+  },
+  rank: {
+    key: "rank",
+    label: "Rank-Based",
+    groupKey: "rank",
+    short: "How specialized a location is",
+    description:
+      "How strongly specialized a location is. High margin = monoculture-like; low margin = diversified.",
+  },
+};
+
+// -- Admin boundaries (vector tiles -- click/hover interaction) ───────────────
+// Country boundaries shown z0–z3, state/province boundaries shown z4+
+export const COUNTRY_BOUNDARIES = {
+  id: "kushankb.01l11tz3",
+  layer: "countries",
+  label: "Countries",
+  idKey: "iso3",
+};
+
+export const ADMIN2_STATES = {
+  id: "kushankb.69o1u9mn",
+  layer: "admin2",
+  label: "States / Provinces",
+  idKey: "ID",
 };
 
 // -- Layer descriptions (for button hover tooltips) ---------------------------
 // Each entry has `text` (main description) and optional `source` (citation).
 export const LAYER_DESCRIPTIONS = {
   breadbaskets: {
-    text: "Global food production areas coloured by dominant food group (grains, fruits, meat, etc.).",
-    source: "Data: Plotline breadbasket dataset",
+    text: "Food-producing areas coloured by the food group most concentrated in each location relative to global averages. Shows regional specialisation, not absolute production.",
+    source: "Plotline breadbasket dataset · Z-score classification",
   },
   CDD: {
     text: "Change in maximum consecutive dry days during the growing season under 2\u00b0C warming. Positive = more drought stress.",

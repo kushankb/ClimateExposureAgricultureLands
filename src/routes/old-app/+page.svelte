@@ -4,8 +4,15 @@
   import Map from '$lib/components/Map.svelte';
   import ControlPanel from '$lib/components/ControlPanel.svelte';
   import Legend from '$lib/components/Legend.svelte';
+  import InfoPanel from '$lib/components/InfoPanel.svelte';
+  import ExposurePanel from '$lib/components/ExposurePanel.svelte';
+  import DistrictPanel from '$lib/components/DistrictPanel.svelte';
+  import Onboarding from '$lib/components/Onboarding.svelte';
+  import SearchBar from '$lib/components/SearchBar.svelte';
 
   // ── State ────────────────────────────────────────────────────────────────────
+  let selectedStateId = $state(null);
+  let selectedCountryId  = $state(null);
   let activeLayers      = $state(['breadbaskets']);
   let layerOpacity      = $state({
     breadbaskets: 1.0,
@@ -16,8 +23,26 @@
     farmsize:     0.65,
   });
   let selectedPercentile = $state('p50');
+  let selectedFoodGroup  = $state(null);
   let legendConfig       = $state(null);
   let mapLoaded          = $state(false);
+  let mapRef;
+
+  function handleSearchSelect(item) {
+    // Select the country or state/province
+    if (item.type === 'country') {
+      selectedCountryId = item.id;
+      selectedStateId = null;
+    } else {
+      selectedStateId = item.id;
+      selectedCountryId = null;
+    }
+    // Fly to it
+    const zoom = item.type === 'country' ? 4 : 5;
+    if (mapRef && item.lat && item.lon) {
+      mapRef.flyTo(item.lon, item.lat, zoom);
+    }
+  }
 
   // Set mapLoaded after 2.2s (gives globe time to render)
   onMount(() => {
@@ -47,11 +72,21 @@
 
 <!-- Map -->
 <Map
+  bind:this={mapRef}
   {activeLayers}
   {layerOpacity}
   {selectedPercentile}
+  selectedMethod="zscore"
+  {selectedFoodGroup}
+  {selectedStateId}
+  {selectedCountryId}
   onLegendChange={(cfg) => { legendConfig = cfg; }}
+  onStateSelect={(id) => { selectedStateId = id; selectedCountryId = null; }}
+  onCountrySelect={(id) => { selectedCountryId = id; selectedStateId = null; }}
 />
+
+<!-- Search bar -->
+<SearchBar onSelect={handleSearchSelect} />
 
 <!-- Layer controls -->
 <ControlPanel
@@ -63,6 +98,35 @@
   onPercentileChange={(pctl) => { selectedPercentile = pctl; }}
 />
 
+<!-- Info panel -->
+<InfoPanel />
+
+<!-- Production-weighted exposure panel -->
+<ExposurePanel
+  {activeLayers}
+  {selectedPercentile}
+/>
+
+<!-- State / Province summary (click a state) -->
+<DistrictPanel
+  stateId={selectedStateId}
+  countryId={selectedCountryId}
+  {selectedPercentile}
+  onClose={() => { selectedStateId = null; selectedCountryId = null; }}
+/>
+
+<!-- Onboarding + contextual hints -->
+<Onboarding
+  {activeLayers}
+  {selectedStateId}
+  {selectedCountryId}
+/>
+
 <!-- Legends -->
-<Legend config={legendConfig} {breadbasketActive} />
+<Legend
+  config={legendConfig}
+  {breadbasketActive}
+  {selectedFoodGroup}
+  onSelectFoodGroup={(fg) => { selectedFoodGroup = fg; }}
+/>
 

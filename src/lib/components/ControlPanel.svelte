@@ -4,16 +4,16 @@
   let { activeLayers, layerOpacity, selectedPercentile, onToggle, onOpacityChange, onPercentileChange } = $props();
 
   const CLIMATE_LAYERS = [
-    { key: 'CDD',  label: 'Consecutive Dry Days', unit: '% change',    color: '#d73027' },
-    { key: 'Rx5',  label: 'Max 5-Day Rainfall',   unit: '% change',    color: '#238b45' },
-    { key: 'Tx35', label: 'Days Tmax > 35°C',     unit: 'days change', color: '#fb6a4a' },
-    { key: 'FD',   label: 'Frost Days',           unit: 'days change', color: '#2171b5' },
+    { key: 'CDD',  label: 'Drought Stress',     sub: 'longer dry spells',         color: '#d73027' },
+    { key: 'Rx5',  label: 'Flood Risk',          sub: 'heavier extreme rainfall',  color: '#238b45' },
+    { key: 'Tx35', label: 'Extreme Heat',        sub: 'more days above 35 °C',     color: '#fb6a4a' },
+    { key: 'FD',   label: 'Frost Loss',          sub: 'fewer frost days',          color: '#2171b5' },
   ];
 
   const PERCENTILE_OPTIONS = [
-    { key: 'p05', label: '5th' },
-    { key: 'p50', label: '50th' },
-    { key: 'p95', label: '95th' },
+    { key: 'p05', label: 'Low',  hint: 'optimistic models' },
+    { key: 'p50', label: 'Mid',  hint: 'median estimate' },
+    { key: 'p95', label: 'High', hint: 'pessimistic models' },
   ];
 
   // Tooltip state (layer buttons + info button)
@@ -112,7 +112,7 @@
         <span class="layer-dot"></span>
         <span class="layer-btn-text">
           <span class="layer-btn-label">{lyr.label}</span>
-          <span class="layer-btn-unit">{lyr.unit}</span>
+          <span class="layer-btn-unit">{lyr.sub}</span>
         </span>
       </button>
     </div>
@@ -169,7 +169,7 @@
   <!-- Percentile selector -->
   {#if anyClimateActive}
     <hr class="panel-divider" />
-    <div class="panel-section-label">Ensemble Percentile</div>
+    <div class="panel-section-label">Model Confidence</div>
     <div class="percentile-selector">
       {#each PERCENTILE_OPTIONS as opt}
         <button
@@ -180,7 +180,7 @@
         </button>
       {/each}
     </div>
-    <div class="pctl-hint">Switches between climate model ensemble percentiles</div>
+    <div class="pctl-hint">{PERCENTILE_OPTIONS.find(o => o.key === selectedPercentile)?.hint ?? ''}</div>
   {/if}
 </div>
 
