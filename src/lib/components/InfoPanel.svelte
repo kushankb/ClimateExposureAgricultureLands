@@ -35,7 +35,7 @@
     },
     {
       size: "Large farms (>50 ha)",
-      detail: "Lower per-area exposure overall, but still face significant drought risk in key breadbaskets",
+      detail: "Lower per-area exposure overall, but still face significant drought risk in key production zones",
     },
   ];
 
@@ -125,7 +125,7 @@
         </div>
         <div class="info-source-row">
           <span class="info-source-label">Food production</span>
-          <span class="info-source-value">Plotline breadbasket dataset</span>
+          <span class="info-source-value">Plotline production dataset</span>
         </div>
         <div class="info-source-row">
           <span class="info-source-label">Farm size</span>

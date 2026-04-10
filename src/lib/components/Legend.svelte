@@ -38,7 +38,7 @@
   <!-- Breadbasket categorical legend -->
   {#if breadbasketActive}
     <div class="legend legend-categorical">
-      <div class="legend-title">Food Breadbaskets</div>
+      <div class="legend-title">Food Production Zones</div>
       <div class="legend-swatches">
         {#each foodGroups as [key, { color, label }]}
           <div

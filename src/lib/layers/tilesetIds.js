@@ -44,7 +44,7 @@ export const FOOD_GROUP_BY_CODE = Object.fromEntries(
 export const BREADBASKET = {
   id: "kushankb.breadbaskets4",
   layer: "breadbaskets",
-  label: "Food Breadbaskets",
+  label: "Food Production Zones",
   groupKey: "zscore",     // default method key — overridden by selected method
   valueKey: "c",
 };
@@ -113,7 +113,7 @@ export const ADMIN2_STATES = {
 export const LAYER_DESCRIPTIONS = {
   breadbaskets: {
     text: "Food-producing areas coloured by the food group most concentrated in each location relative to global averages. Shows regional specialisation, not absolute production.",
-    source: "Plotline breadbasket dataset · Z-score classification",
+    source: "Plotline production dataset · Z-score classification",
   },
   CDD: {
     text: "Change in maximum consecutive dry days during the growing season under 2\u00b0C warming. Positive = more drought stress.",
