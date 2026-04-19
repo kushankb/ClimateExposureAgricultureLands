@@ -263,7 +263,7 @@ html, body {
   margin: 12px 0;
 }
 
-/* ── Legend stack (bottom-right, multiple legends stacked) ───── */
+/* ── Legend stack (bottom-right, raster gradient) ───────────── */
 .legend-stack {
   position: absolute;
   bottom: 36px; right: 20px;
@@ -307,15 +307,27 @@ html, body {
   color: var(--text-muted);
 }
 
-/* ── Legend (categorical — breadbasket food groups) ─────────── */
+/* ── Food Production Zones legend (centre-bottom) ───────────── */
+.legend-categorical-wrap {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* nudge right of the How to use button (approx 160px wide) */
+  margin-left: 90px;
+  z-index: 10;
+}
+
+/* ── Legend (categorical — food groups) ─────────────────────── */
 .legend-categorical {
-  min-width: 170px;
+  min-width: 0;
 }
 
 .legend-swatches {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 4px 14px;
 }
 
 .legend-swatch-row {

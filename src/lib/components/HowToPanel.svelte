@@ -2,12 +2,13 @@
   let open = $state(false);
 
   const STEPS = [
-    { icon: "🔍", action: "Search",       desc: "Type a country or region in the search bar" },
-    { icon: "🖱️", action: "Click",        desc: "Click any country or state to see its food production & climate exposure" },
-    { icon: "🔎", action: "Zoom in",      desc: "Zoom in past country level to explore state / province detail" },
-    { icon: "🌡️", action: "Add a layer",  desc: "Toggle a climate layer (drought, heat, flood, frost) on the left panel" },
-    { icon: "📊", action: "Confidence",   desc: "Switch Low / Medium / High to see the range of model projections" },
-    { icon: "🎨", action: "Filter",       desc: "Click a food group in the legend to highlight only that group" },
+    { action: "Search",        desc: "Type a country or region in the search bar" },
+    { action: "Click",         desc: "Click any country or state to see its food production & climate exposure" },
+    { action: "Zoom in",       desc: "Zoom in past country level to explore state / province detail" },
+    { action: "Add a layer",   desc: "Toggle a climate layer (drought, heat, flood, frost) on the left panel" },
+    { action: "Farm size",     desc: "Turn on the Farm Size overlay to see how exposure varies by farm scale" },
+    { action: "Confidence",    desc: "Switch Low / Medium / High to see the range of model projections" },
+    { action: "Filter",        desc: "Click a food group in the legend to highlight only that group" },
   ];
 </script>
 
@@ -20,7 +21,6 @@
     <div class="how-content">
       {#each STEPS as s}
         <div class="how-step">
-          <span class="how-icon">{s.icon}</span>
           <div class="how-text">
             <span class="how-action">{s.action}</span>
             <span class="how-desc">{s.desc}</span>
@@ -44,9 +44,9 @@
     background: rgba(14, 18, 28, 0.92);
     border: 1px solid rgba(255, 255, 255, 0.14);
     color: #c8cdd6;
-    font-size: 12px;
+    font-size: 0.72rem;
     font-weight: 500;
-    padding: 7px 13px;
+    padding: 6px 14px;
     border-radius: 7px;
     cursor: pointer;
     font-family: inherit;
@@ -68,24 +68,18 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
     padding: 12px 14px;
-    width: 260px;
+    width: 420px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px 20px;
   }
 
   .how-step {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-  }
-
-  .how-icon {
-    font-size: 15px;
-    flex-shrink: 0;
-    margin-top: 1px;
   }
 
   .how-text {
