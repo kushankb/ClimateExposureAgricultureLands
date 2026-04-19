@@ -398,21 +398,21 @@
 
     m.on('style.load', () => {
       m.setFog({
-        color:           'rgb(18, 16, 13)',
-        'high-color':    'rgb(24, 21, 17)',
+        color:           'rgb(8, 12, 22)',
+        'high-color':    'rgb(13, 17, 32)',
         'horizon-blend': 0.008,
-        'space-color':   'rgb(8, 7, 5)',
-        'star-intensity': 0.4,
+        'space-color':   'rgb(4, 6, 12)',
+        'star-intensity': 0.5,
       });
 
       const style = m.getStyle();
       if (style && style.layers) {
         for (const layer of style.layers) {
           if (layer.id === 'land' && layer.type === 'background') {
-            m.setPaintProperty('land', 'background-color', '#201e1a');
+            m.setPaintProperty('land', 'background-color', '#0d1120');
           }
           if (layer.id === 'water' && layer.type === 'fill') {
-            m.setPaintProperty('water', 'fill-color', '#161410');
+            m.setPaintProperty('water', 'fill-color', '#080e1c');
           }
           if (layer.id.includes('landuse') || layer.id.includes('landcover')) {
             if (layer.type === 'fill') {

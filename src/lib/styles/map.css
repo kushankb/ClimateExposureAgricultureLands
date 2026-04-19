@@ -8,10 +8,10 @@
 
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
-  --bg-base:        #0e0d0b;
-  --bg-panel:       rgba(22, 20, 17, 0.92);
-  --bg-panel-hover: #1e1c18;
-  --border:         #2e2b25;
+  --bg-base:        #080c16;
+  --bg-panel:       rgba(13, 17, 32, 0.92);
+  --bg-panel-hover: #161c2e;
+  --border:         #1e2640;
   --text-primary:   #e8edf4;
   --text-secondary: #7a8fa6;
   --text-muted:     #3d5066;
@@ -535,7 +535,7 @@ html, body {
   padding: 14px 16px;
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow);
-  max-height: calc(100vh - 160px);
+  max-height: calc(100vh - 280px);
   overflow-y: auto;
 }
 
