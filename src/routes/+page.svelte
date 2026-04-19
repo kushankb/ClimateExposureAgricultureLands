@@ -9,6 +9,7 @@
   import DistrictPanel from '$lib/components/DistrictPanel.svelte';
   import Onboarding from '$lib/components/Onboarding.svelte';
   import SearchBar from '$lib/components/SearchBar.svelte';
+  import HowToPanel from '$lib/components/HowToPanel.svelte';
 
   // ── State ────────────────────────────────────────────────────────────────────
   let selectedStateId = $state(null);
@@ -100,6 +101,9 @@
 
 <!-- Info panel -->
 <InfoPanel />
+
+<!-- How to use -->
+<HowToPanel />
 
 <!-- Production-weighted exposure panel -->
 <ExposurePanel
