@@ -19,26 +19,10 @@
   }
 </script>
 
-<!-- Raster overlay gradient legend (bottom-right) -->
-{#if config?.legendColors}
-  <div class="legend-stack">
-    <div class="legend">
-      <div class="legend-title">{config.label} ({config.unit})</div>
-      <div class="legend-gradient" style="background: {gradientStyle}"></div>
-      <div class="legend-labels">
-        {#each config.legendColors as { label }, i}
-          {#if i === 0 || i === config.legendColors.length - 1 || i === Math.floor(config.legendColors.length / 2)}
-            <span>{label}</span>
-          {/if}
-        {/each}
-      </div>
-    </div>
-  </div>
-{/if}
-
-<!-- Food Production Zones categorical legend (centre-bottom) -->
-{#if breadbasketActive}
-  <div class="legend-categorical-wrap">
+<!-- Bottom-right legend stack: food groups + optional raster gradient -->
+<div class="legend-stack">
+  <!-- Food Production Zones categorical legend -->
+  {#if breadbasketActive}
     <div class="legend legend-categorical">
       <div class="legend-title">Food Production Zones</div>
       <div class="legend-swatches">
@@ -60,5 +44,20 @@
         {selectedFoodGroup ? 'Click selected group to reset' : 'Click a food group to filter'}
       </div>
     </div>
-  </div>
-{/if}
+  {/if}
+
+  <!-- Raster overlay gradient legend -->
+  {#if config?.legendColors}
+    <div class="legend">
+      <div class="legend-title">{config.label} ({config.unit})</div>
+      <div class="legend-gradient" style="background: {gradientStyle}"></div>
+      <div class="legend-labels">
+        {#each config.legendColors as { label }, i}
+          {#if i === 0 || i === config.legendColors.length - 1 || i === Math.floor(config.legendColors.length / 2)}
+            <span>{label}</span>
+          {/if}
+        {/each}
+      </div>
+    </div>
+  {/if}
+</div>

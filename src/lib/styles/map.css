@@ -307,27 +307,15 @@ html, body {
   color: var(--text-muted);
 }
 
-/* ── Food Production Zones legend (centre-bottom) ───────────── */
-.legend-categorical-wrap {
-  position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  /* nudge right of the How to use button (approx 160px wide) */
-  margin-left: 90px;
-  z-index: 10;
-}
-
 /* ── Legend (categorical — food groups) ─────────────────────── */
 .legend-categorical {
-  min-width: 0;
+  min-width: 170px;
 }
 
 .legend-swatches {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 4px 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
 }
 
 .legend-swatch-row {
@@ -518,7 +506,7 @@ html, body {
   position: absolute;
   top: 20px; right: 60px;
   z-index: 10;
-  max-width: 340px;
+  max-width: 260px;
 }
 
 .info-toggle {
