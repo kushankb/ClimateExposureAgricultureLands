@@ -8,10 +8,10 @@
 
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
-  --bg-base:        #0a0e14;
-  --bg-panel:       rgba(17, 22, 32, 0.92);
-  --bg-panel-hover: #1a2030;
-  --border:         #232d3f;
+  --bg-base:        #0e0d0b;
+  --bg-panel:       rgba(22, 20, 17, 0.92);
+  --bg-panel-hover: #1e1c18;
+  --border:         #2e2b25;
   --text-primary:   #e8edf4;
   --text-secondary: #7a8fa6;
   --text-muted:     #3d5066;
