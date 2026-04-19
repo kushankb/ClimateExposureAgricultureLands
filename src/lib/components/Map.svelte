@@ -420,7 +420,8 @@
             }
           }
           if (layer.id.includes('admin') && layer.type === 'line') {
-            m.setPaintProperty(layer.id, 'line-opacity', 0.25);
+            // Hide Mapbox's built-in admin lines — we render our own tileset boundaries
+            m.setLayoutProperty(layer.id, 'visibility', 'none');
           }
         }
       }
