@@ -447,31 +447,31 @@
   onclick={toggleMapStyle}
   title={isDark ? 'Switch to light map' : 'Switch to dark map'}
 >
-  {isDark ? '☀️' : '🌙'}
+  {isDark ? '☀ Light map' : '🌙 Dark map'}
 </button>
 
 <style>
   .style-toggle {
     position: absolute;
-    bottom: 90px;
-    right: 10px;
+    bottom: 70px;
+    left: 16px;
     z-index: 8;
-    width: 30px;
-    height: 30px;
     background: rgba(14, 18, 28, 0.92);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 7px;
     cursor: pointer;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(6px);
-    transition: background 0.15s;
-    padding: 0;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #c8cdd6;
+    font-family: system-ui, -apple-system, sans-serif;
+    padding: 6px 14px;
+    backdrop-filter: blur(8px);
+    transition: all 0.15s;
+    white-space: nowrap;
   }
   .style-toggle:hover {
-    background: rgba(100, 210, 255, 0.15);
-    border-color: rgba(100, 210, 255, 0.4);
+    background: rgba(100, 210, 255, 0.1);
+    border-color: rgba(100, 210, 255, 0.3);
+    color: #fff;
   }
 </style>
