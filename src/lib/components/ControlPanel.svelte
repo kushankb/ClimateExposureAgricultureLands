@@ -11,9 +11,9 @@
   ];
 
   const PERCENTILE_OPTIONS = [
-    { key: 'p05', label: 'Low',    hint: 'optimistic models' },
-    { key: 'p50', label: 'Medium', hint: 'median estimate' },
-    { key: 'p95', label: 'High',   hint: 'pessimistic models' },
+    { key: 'p05', label: 'Lower bound',      hint: 'optimistic models' },
+    { key: 'p50', label: 'Central estimate', hint: 'median projection' },
+    { key: 'p95', label: 'Upper bound',      hint: 'pessimistic models' },
   ];
 
   // Tooltip state (layer buttons + info button)
